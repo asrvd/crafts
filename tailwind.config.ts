@@ -12,6 +12,9 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        sans: ["Cabinet Grotesk", "sans-serif"],
+      },
     },
   },
   plugins: [],
