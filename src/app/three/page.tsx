@@ -201,7 +201,7 @@ export default function Three() {
                       left: "50%",
                       x: "-50%",
                       y: "-50%",
-                      scale: 1.2
+                      scale: 1.05
                     }}
                     exit={{
                       width: cardWidth,
