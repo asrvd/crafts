@@ -13,6 +13,9 @@ export default function Home() {
         <li>
           <Link href="/three">three</Link>
         </li>
+        <li>
+          <Link href="/text">text distortion</Link>
+        </li>
       </ul>
     </div>
   );

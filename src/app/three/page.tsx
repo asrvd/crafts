@@ -60,7 +60,6 @@ export default function Three() {
   const [initialCardPositions, setInitialCardPositions] = useState<
     Array<{ top: number; left: number }>
   >([]);
-  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -87,34 +86,18 @@ export default function Three() {
     cardRefs.current = cardRefs.current.slice(0, cards.length);
   }, []);
 
-  const handleCardOpen = (id: number) => {
-    if (activeCard === null && !isAnimating) {
-      setIsAnimating(true);
-      setActiveCard(id);
-    }
-  };
-
-  const handleCardClose = () => {
-    if (activeCard !== null && !isAnimating) {
-      setIsAnimating(true);
-      setActiveCard(null);
-    }
-  };
-
   return (
     <main className="min-h-screen min-w-screen flex items-center justify-center">
       {/* Background blur when a card is active */}
-      <AnimatePresence>
-        {activeCard && (
-          <motion.div
-            className="fixed inset-0 bg-zinc-500/10 backdrop-blur-sm z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleCardClose}
-          />
-        )}
-      </AnimatePresence>
+      {activeCard && (
+        <motion.div
+          className="fixed inset-0 bg-black/5 backdrop-blur-sm z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setActiveCard(null)}
+        />
+      )}
 
       <div
         className="flex flex-col w-full lg:w-[30%] px-4 max-h-max relative"
@@ -135,15 +118,22 @@ export default function Three() {
                 ref={(el) => {
                   cardRefs.current[index] = el;
                 }}
-                className={`flex gap-4 py-2 px-2 items-center bg-white w-full cursor-pointer`}
+                className={`flex gap-4 py-2 px-2 items-center bg-white w-full cursor-pointer ${
+                  activeCard === card.id ? "invisible" : "visible"
+                }`}
                 initial={{ opacity: 0 }}
-                animate={{
-                  opacity: activeCard === card.id ? 0 : 1,
-                }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{
+                  duration: 0.3,
                   ease: "easeInOut",
+                  delay: index * 0.1,
                 }}
-                onClick={() => handleCardOpen(card.id)}
+                onClick={() => {
+                  if (activeCard === null) {
+                    setActiveCard(card.id);
+                  }
+                }}
               >
                 <div className="flex flex-col gap-4 w-full bg-white">
                   <div className="flex gap-4 items-center w-full max-h-max">
@@ -164,7 +154,7 @@ export default function Three() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleCardOpen(card.id);
+                          setActiveCard(card.id);
                         }}
                         className="text-blue-600 font-medium rounded-full px-3 py-1 max-h-max max-w-max bg-zinc-100/80 hover:bg-zinc-100 focus:ring-1 focus:ring-zinc-200 transition-all duration-300 border border-zinc-200/40 leading-tight"
                       >
@@ -179,11 +169,7 @@ export default function Three() {
               </motion.div>
 
               {/* Animated absolute card (shown when active) */}
-              <AnimatePresence
-                onExitComplete={() => {
-                  setIsAnimating(false);
-                }}
-              >
+              <AnimatePresence>
                 {activeCard === card.id && (
                   <motion.div
                     className="fixed z-50 bg-white rounded-2xl border border-zinc-200 shadow-lg"
@@ -192,35 +178,25 @@ export default function Three() {
                       opacity: 0,
                       top: initialPosition.top,
                       left: initialPosition.left,
-                      y: 0,
                       scale: 1,
                     }}
                     animate={{
                       opacity: 1,
-                      top: "50%",
-                      left: "50%",
-                      x: "-50%",
-                      y: "-50%",
-                      scale: 1.05
+                      top: "50%", // More precise adjustment for vertical centering
+                      transform: "translateY(-50%)",
+                      transformOrigin: "center",
+                      scale: 1.5,
                     }}
                     exit={{
                       width: cardWidth,
+                      scale: 1,
                       opacity: 0,
                       top: initialPosition.top,
                       left: initialPosition.left,
-                      x: 0,
-                      y: 0,
-                      scale: 1,
                     }}
                     transition={{
                       duration: 0.3,
-                      ease: "easeInOut",
-                      type: "tween"
-                    }}
-                    onAnimationComplete={() => {
-                      if (activeCard !== null) {
-                        setIsAnimating(false);
-                      }
+                      type: "tween",
                     }}
                   >
                     <div className="flex flex-col gap-4 w-full p-4">
@@ -242,7 +218,7 @@ export default function Three() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCardClose();
+                              setActiveCard(null);
                             }}
                             className="text-blue-600 font-medium rounded-full px-3 py-1 max-h-max max-w-max bg-zinc-100/80 hover:bg-zinc-100 focus:ring-1 focus:ring-zinc-200 transition-all duration-300 border border-zinc-200/40 leading-tight"
                           >
@@ -252,12 +228,12 @@ export default function Three() {
                       </div>
                       <motion.p
                         className="text-sm text-zinc-600"
-                        initial={{ opacity: 0, height: 0, filter: "blur(10px)" }}
-                        animate={{ opacity: 1, height: "auto", filter: "blur(0px)" }}
-                        exit={{ opacity: 0, height: 0, filter: "blur(10px)" }}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
                         transition={{
-                          duration: 0.2,
-                          ease: "easeOut",
+                          duration: 0.3,
+                          ease: "easeInOut",
                           delay: 0.1,
                         }}
                       >
