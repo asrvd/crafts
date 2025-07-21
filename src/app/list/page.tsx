@@ -175,7 +175,7 @@ export default function ListAnimation() {
 
   const [hoveredElement, setHoveredElement] = useState<number | null>(null);
 
-  const springSlideX = useSpring(0, {
+  const springSlideY = useSpring(0, {
     stiffness: 150,
     damping: 25,
     mass: 0.1,
@@ -186,15 +186,15 @@ export default function ListAnimation() {
       console.log(
         "hoveredElement",
         hoveredElement,
-        ((hoveredElement ?? 1) - 1) * 500
+        ((hoveredElement ?? 1) - 1) * 350
       );
-      springSlideX.set(-((hoveredElement ?? 1) - 1) * 500);
+      springSlideY.set(-((hoveredElement ?? 1) - 1) * 350);
     } else {
-      springSlideX.set(0);
+      springSlideY.set(0);
     }
-  }, [hoveredElement, springSlideX]);
+  }, [hoveredElement, springSlideY]);
 
-  console.log(springSlideX);
+  console.log(springSlideY);
 
   return (
     <main className="flex flex-col items-center h-screen w-screen font-sans p-4 justify-center">
@@ -245,7 +245,16 @@ export default function ListAnimation() {
         </AnimatePresence>
 
         <motion.div
-          className="fixed w-[500px] h-[350px] z-10 overflow-hidden pointer-events-none"
+          className="fixed w-[500px] h-[350px] z-10 overflow-hidden pointer-events-none origin-top-left"
+          initial={{
+            opacity: 0,
+            scale: 0.5,
+          }}
+          animate={{
+            opacity: hoveredElement && allImagesPreloaded ? 1 : 0,
+            scale: hoveredElement && allImagesPreloaded ? 1 : 0.5,
+          }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
           style={{
             top: springY,
             left: springX,
@@ -253,11 +262,11 @@ export default function ListAnimation() {
           }}
         >
           <motion.div
-            className="flex"
+            className="flex flex-col"
             style={{
-              x: springSlideX,
-              width: `${listElements.length * 500}px`,
-              height: "100%",
+              y: springSlideY,
+              width: "500px",
+              height: `${listElements.length * 350}px`,
             }}
           >
             {listElements.map((element) => (
